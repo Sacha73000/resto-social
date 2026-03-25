@@ -67,14 +67,15 @@ export async function POST(request: NextRequest) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
+        // current_period_end est dans les items (nouvelle API Stripe)
+        const subItem = subscription.items.data[0] as unknown as { current_period_end: number };
+        const periodEnd = subItem?.current_period_end || Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
 
         await supabase
           .from("subscriptions")
           .update({
             status: subscription.status === "active" ? "active" : "past_due",
-            current_period_end: new Date(
-              (subscription as unknown as { current_period_end: number }).current_period_end * 1000
-            ).toISOString(),
+            current_period_end: new Date(periodEnd * 1000).toISOString(),
             updated_at: new Date().toISOString(),
           })
           .eq("stripe_customer_id", customerId);
