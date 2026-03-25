@@ -34,7 +34,7 @@ export const stripe = new Proxy({} as Stripe, {
 export const PLANS = {
   starter: {
     name: "Starter",
-    price: 49,
+    price: 3,
     generations: 30,
     priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || "",
     features: [
