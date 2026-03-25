@@ -37,11 +37,17 @@ export default function DashboardPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/auth/login"); return; }
 
-      // Si on revient d'un paiement Stripe, vérifie et synchronise l'abonnement
+      // Synchronise toujours l'abonnement avec Stripe (pas seulement après checkout)
+      try {
+        const verifyRes = await fetch("/api/stripe/verify", { method: "POST", credentials: "include" });
+        const verifyData = await verifyRes.json();
+        console.log("Verify result:", verifyData);
+      } catch (e) {
+        console.error("Verify error:", e);
+      }
+      // Nettoie l'URL si on revient de checkout
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("checkout") === "success") {
-        await fetch("/api/stripe/verify", { method: "POST" });
-        // Nettoie l'URL
         window.history.replaceState({}, "", "/dashboard");
       }
 

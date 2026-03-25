@@ -27,7 +27,13 @@ export default function SubscriptionPage() {
       if (!user) { router.push("/auth/login"); return; }
 
       // Synchronise d'abord avec Stripe pour s'assurer que la base est à jour
-      await fetch("/api/stripe/verify", { method: "POST" });
+      try {
+        const verifyRes = await fetch("/api/stripe/verify", { method: "POST", credentials: "include" });
+        const verifyData = await verifyRes.json();
+        console.log("Verify result:", verifyData);
+      } catch (e) {
+        console.error("Verify error:", e);
+      }
 
       const { data } = await supabase
         .from("subscriptions")

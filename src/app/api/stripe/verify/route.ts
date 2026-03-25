@@ -31,14 +31,19 @@ export async function POST() {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !user.email) {
+      console.error("[verify] Pas d'utilisateur connecté");
       return NextResponse.json({ error: "Non connecté" }, { status: 401 });
     }
 
-    // 2. Cherche TOUS les customers Stripe avec cet email (ne dépend pas de la base)
+    console.log("[verify] User:", user.email, user.id);
+
+    // 2. Cherche TOUS les customers Stripe avec cet email
     const customers = await stripe.customers.list({
       email: user.email,
       limit: 10,
     });
+
+    console.log("[verify] Customers Stripe trouvés:", customers.data.length);
 
     if (customers.data.length === 0) {
       return NextResponse.json({ status: "no_customer" });
@@ -52,64 +57,63 @@ export async function POST() {
         limit: 1,
       });
 
+      console.log("[verify] Customer:", customer.id, "- Subs actifs:", subscriptions.data.length);
+
       if (subscriptions.data.length > 0) {
         const stripeSub = subscriptions.data[0];
         const priceId = stripeSub.items.data[0]?.price?.id;
         const starterPriceId = process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID;
         const proPriceId = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID;
 
+        console.log("[verify] Price ID trouvé:", priceId, "| Starter:", starterPriceId, "| Pro:", proPriceId);
+
         let plan = "starter";
         if (priceId === proPriceId) plan = "pro";
         else if (priceId === starterPriceId) plan = "starter";
 
-        // current_period_end est dans les items (nouvelle API Stripe)
-        const item = stripeSub.items.data[0] as unknown as { current_period_end: number };
+        // current_period_end est dans les items (nouvelle API Stripe 2026)
+        const item = stripeSub.items.data[0] as unknown as { current_period_end?: number };
         const periodEnd = item?.current_period_end || Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
 
-        // 4. Met à jour la base de données avec upsert
-        const adminSupabase = createServiceClient();
-        const { error } = await adminSupabase
-          .from("subscriptions")
-          .upsert(
-            {
-              user_id: user.id,
-              stripe_customer_id: customer.id,
-              stripe_subscription_id: stripeSub.id,
-              plan,
-              status: "active",
-              current_period_end: new Date(periodEnd * 1000).toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "user_id" }
-          );
+        console.log("[verify] Plan:", plan, "| Period end:", periodEnd);
 
-        if (error) {
-          console.error("Erreur upsert subscription:", error);
-          // Si l'upsert échoue, essayons un delete + insert
-          await adminSupabase.from("subscriptions").delete().eq("user_id", user.id);
-          const { error: insertError } = await adminSupabase
-            .from("subscriptions")
-            .insert({
-              user_id: user.id,
-              stripe_customer_id: customer.id,
-              stripe_subscription_id: stripeSub.id,
-              plan,
-              status: "active",
-              current_period_end: new Date(periodEnd * 1000).toISOString(),
-            });
-          if (insertError) {
-            console.error("Erreur insert subscription:", insertError);
-            return NextResponse.json({ error: insertError.message }, { status: 500 });
-          }
+        // 4. Met à jour la base de données
+        const adminSupabase = createServiceClient();
+
+        // D'abord, supprime toute entrée existante pour cet utilisateur
+        const { error: deleteError } = await adminSupabase
+          .from("subscriptions")
+          .delete()
+          .eq("user_id", user.id);
+
+        console.log("[verify] Delete existing:", deleteError ? deleteError.message : "OK");
+
+        // Puis insère la nouvelle entrée
+        const { error: insertError } = await adminSupabase
+          .from("subscriptions")
+          .insert({
+            user_id: user.id,
+            stripe_customer_id: customer.id,
+            stripe_subscription_id: stripeSub.id,
+            plan,
+            status: "active",
+            current_period_end: new Date(periodEnd * 1000).toISOString(),
+          });
+
+        if (insertError) {
+          console.error("[verify] INSERT ERROR:", insertError);
+          return NextResponse.json({ error: insertError.message, step: "insert" }, { status: 500 });
         }
 
+        console.log("[verify] SUCCESS! Plan:", plan);
         return NextResponse.json({ status: "active", plan });
       }
     }
 
+    console.log("[verify] Aucun abonnement actif trouvé");
     return NextResponse.json({ status: "no_active_subscription" });
   } catch (error) {
-    console.error("Erreur vérification Stripe :", error);
+    console.error("[verify] ERREUR:", error);
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: errMsg }, { status: 500 });
   }
