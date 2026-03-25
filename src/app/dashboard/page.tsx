@@ -37,6 +37,14 @@ export default function DashboardPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/auth/login"); return; }
 
+      // Si on revient d'un paiement Stripe, vérifie et synchronise l'abonnement
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("checkout") === "success") {
+        await fetch("/api/stripe/verify", { method: "POST" });
+        // Nettoie l'URL
+        window.history.replaceState({}, "", "/dashboard");
+      }
+
       const { data: gens } = await supabase
         .from("generations").select("*").order("created_at", { ascending: false }).limit(50);
 

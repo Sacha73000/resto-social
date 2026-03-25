@@ -26,6 +26,9 @@ export default function SubscriptionPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/auth/login"); return; }
 
+      // Synchronise d'abord avec Stripe pour s'assurer que la base est à jour
+      await fetch("/api/stripe/verify", { method: "POST" });
+
       const { data } = await supabase
         .from("subscriptions")
         .select("plan, status, current_period_end, stripe_subscription_id")
