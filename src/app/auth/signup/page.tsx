@@ -1,7 +1,6 @@
 "use client";
 
-// PAGE D'INSCRIPTION
-// L'utilisateur crée un compte avec email + mot de passe
+// PAGE D'INSCRIPTION — style sombre luxueux
 
 import { useState } from "react";
 import Link from "next/link";
@@ -31,11 +30,7 @@ export default function SignupPage() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            restaurant_name: restaurantName,
-          },
-        },
+        options: { data: { restaurant_name: restaurantName } },
       });
 
       if (error) {
@@ -47,7 +42,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Inscription réussie — on met à jour le nom du restaurant dans le profil
       setSuccess(true);
     } catch {
       setError("Une erreur inattendue est survenue. Réessaie.");
@@ -56,24 +50,22 @@ export default function SignupPage() {
     }
   };
 
-  // Message de succès après inscription
   if (success) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <div className="min-h-[80vh] flex items-center justify-center px-4 pt-20">
         <div className="w-full max-w-md text-center">
-          <div className="bg-green-50 rounded-2xl p-8 border border-green-100">
+          <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#C9A96E]/20">
             <span className="text-5xl">📧</span>
-            <h2 className="mt-4 text-2xl font-bold text-gray-900">
+            <h2 className="mt-4 text-2xl font-[family-name:var(--font-playfair)] font-bold text-white">
               Vérifie ta boîte mail !
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-gray-400">
               On t&apos;a envoyé un email de confirmation à{" "}
-              <strong>{email}</strong>. Clique sur le lien pour activer ton
-              compte.
+              <strong className="text-[#C9A96E]">{email}</strong>. Clique sur le lien pour activer ton compte.
             </p>
             <Link
               href="/auth/login"
-              className="mt-6 inline-block bg-orange-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-orange-600 transition"
+              className="mt-6 inline-block bg-[#C9A96E] text-black px-6 py-2.5 rounded-lg font-semibold hover:bg-[#D4B87A] transition uppercase tracking-wider text-sm"
             >
               Aller à la connexion
             </Link>
@@ -84,30 +76,27 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 pt-20">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Créer un compte</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-white">Créer un compte</h1>
+          <p className="mt-2 text-gray-500">
             Commence à générer des posts pour ton restaurant.
           </p>
         </div>
 
         <form
           onSubmit={handleSignup}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-5"
+          className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-8 space-y-5"
         >
           {error && (
-            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label
-              htmlFor="restaurant"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="restaurant" className="block text-sm font-medium text-gray-400 mb-1">
               Nom du restaurant
             </label>
             <input
@@ -117,15 +106,12 @@ export default function SignupPage() {
               onChange={(e) => setRestaurantName(e.target.value)}
               required
               placeholder="Ex: Le Petit Bistro"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#222] border border-[#333] text-white placeholder-gray-600 focus:border-[#C9A96E] focus:ring-1 focus:ring-[#C9A96E]/20 outline-none transition"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
               Email
             </label>
             <input
@@ -135,15 +121,12 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="ton@email.com"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#222] border border-[#333] text-white placeholder-gray-600 focus:border-[#C9A96E] focus:ring-1 focus:ring-[#C9A96E]/20 outline-none transition"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-1">
               Mot de passe
             </label>
             <input
@@ -153,24 +136,21 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="Minimum 6 caractères"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#222] border border-[#333] text-white placeholder-gray-600 focus:border-[#C9A96E] focus:ring-1 focus:ring-[#C9A96E]/20 outline-none transition"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#C9A96E] text-black py-3 rounded-lg font-semibold hover:bg-[#D4B87A] transition disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm"
           >
             {loading ? "Création du compte..." : "Créer mon compte"}
           </button>
 
           <p className="text-center text-sm text-gray-500">
             Déjà un compte ?{" "}
-            <Link
-              href="/auth/login"
-              className="text-orange-500 font-medium hover:underline"
-            >
+            <Link href="/auth/login" className="text-[#C9A96E] font-medium hover:underline">
               Se connecter
             </Link>
           </p>

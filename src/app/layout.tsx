@@ -3,12 +3,13 @@
 // Il contient la barre de navigation, le footer, et les métadonnées SEO
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 // Force le rendu dynamique pour toutes les pages (app SaaS avec auth)
 export const dynamic = "force-dynamic";
@@ -27,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${inter.className} antialiased bg-gray-50 min-h-screen flex flex-col`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-[#111111] min-h-screen flex flex-col`}>
         <Navbar />
         <div className="flex-1">{children}</div>
         <Footer />

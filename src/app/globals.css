@@ -2,8 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Styles de base — couleurs chaudes pour la restauration */
+/* Design sombre luxueux — inspiré marbre et cuivre */
+:root {
+  --gold: #C9A96E;
+  --gold-light: #D4B87A;
+  --dark: #1A1A1A;
+  --dark-card: #222222;
+  --dark-border: #333333;
+}
+
 body {
-  color: #171717;
-  background: #fafafa;
+  color: #E8E8E8;
+  background: #111111;
+}
+
+/* Scrollbar élégante */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1A1A1A;
+}
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+/* Sélection dorée */
+::selection {
+  background: rgba(201, 169, 110, 0.3);
+  color: #fff;
+}
+
+/* Animation subtile pour le cercle décoratif */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Glow effect pour les boutons dorés */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(201, 169, 110, 0.3), 0 0 40px rgba(201, 169, 110, 0.1);
 }
