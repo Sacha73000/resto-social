@@ -27,7 +27,7 @@ export default function SignupPage() {
 
     try {
       const supabase = getSupabaseBrowser();
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { restaurant_name: restaurantName } },
@@ -35,10 +35,16 @@ export default function SignupPage() {
 
       if (error) {
         if (error.message.includes("already registered")) {
-          setError("Cet email est déjà utilisé. Essaie de te connecter.");
+          setError("Un compte existe déjà avec cet email. Connecte-toi plutôt !");
         } else {
           setError("Erreur lors de l'inscription : " + error.message);
         }
+        return;
+      }
+
+      // Supabase renvoie un user avec identities vide si l'email existe déjà
+      if (data?.user?.identities?.length === 0) {
+        setError("Un compte existe déjà avec cet email. Connecte-toi plutôt !");
         return;
       }
 
