@@ -107,8 +107,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("Erreur Stripe checkout :", error);
+    const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: "Erreur lors de la création du paiement. Vérifie ta configuration Stripe." },
+      { error: `Erreur paiement : ${errMsg}` },
       { status: 500 }
     );
   }
