@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifie la limite mensuelle selon le plan
     if (plan === "free" || plan === "starter") {
-      const limit = plan === "free" ? 5 : 30;
+      const limit = plan === "free" ? 3 : 30;
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
       if ((count || 0) >= limit) {
         const msg = plan === "free"
-          ? "Tu as utilisé tes 5 générations gratuites ce mois-ci. Abonne-toi pour continuer !"
+          ? "Tu as utilisé tes 3 générations gratuites ce mois-ci. Abonne-toi pour continuer !"
           : "Tu as atteint ta limite de 30 générations ce mois-ci. Passe au plan Pro pour des générations illimitées !";
         return NextResponse.json({ error: msg }, { status: 429 });
       }
