@@ -48,13 +48,17 @@ export async function POST(request: NextRequest) {
         if (userId && plan) {
           await supabase
             .from("subscriptions")
-            .upsert({
-              user_id: userId,
-              stripe_customer_id: session.customer as string,
-              stripe_subscription_id: session.subscription as string,
-              plan,
-              status: "active",
-            });
+            .upsert(
+              {
+                user_id: userId,
+                stripe_customer_id: session.customer as string,
+                stripe_subscription_id: session.subscription as string,
+                plan,
+                status: "active",
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "user_id" }
+            );
         }
         break;
       }
