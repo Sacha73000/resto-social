@@ -80,8 +80,9 @@ export default function DashboardPage() {
     );
   }
 
-  const plan = subscription?.plan || "starter";
-  const maxGenerations = plan === "pro" ? Infinity : 30;
+  const isActive = subscription?.status === "active";
+  const plan = isActive ? (subscription?.plan || "free") : "free";
+  const maxGenerations = plan === "pro" ? Infinity : plan === "starter" ? 30 : 3;
   const remaining = plan === "pro" ? "∞" : Math.max(0, maxGenerations - monthlyCount);
 
   return (
@@ -112,7 +113,7 @@ export default function DashboardPage() {
         </div>
         <div className="bg-[#1A1A1A] rounded-xl p-6 border border-[#2A2A2A]">
           <p className="text-sm text-gray-500">Plan actuel</p>
-          <p className="text-3xl font-bold text-white mt-1 capitalize">{plan}</p>
+          <p className="text-3xl font-bold text-white mt-1 capitalize">{plan === "free" ? "Gratuit" : plan}</p>
           <Link href="/subscription" className="text-sm text-[#C9A96E] hover:underline">
             Gérer →
           </Link>
