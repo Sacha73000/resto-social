@@ -80,12 +80,12 @@ export async function POST(request: Request) {
       });
       customerId = customer.id;
 
-      // Sauvegarde le customer ID
+      // Sauvegarde le customer ID (sans activer de plan — le webhook Stripe le fera après paiement)
       await adminSupabase.from("subscriptions").upsert({
         user_id: user.id,
         stripe_customer_id: customerId,
         plan: "starter",
-        status: "active",
+        status: "canceled",
       });
     }
 

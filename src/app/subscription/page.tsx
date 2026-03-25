@@ -71,8 +71,8 @@ export default function SubscriptionPage() {
     );
   }
 
-  const currentPlan = subscription?.plan || "none";
   const isActive = subscription?.status === "active";
+  const currentPlan = isActive ? (subscription?.plan || "none") : "none";
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
@@ -126,7 +126,7 @@ export default function SubscriptionPage() {
         }`}>
           <h3 className="text-xl font-bold text-white">Starter</h3>
           <div className="mt-2 flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-white">49€</span>
+            <span className="text-3xl font-bold text-white">3€</span>
             <span className="text-gray-500">/mois</span>
           </div>
           <ul className="mt-4 space-y-2">
