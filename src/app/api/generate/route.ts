@@ -47,7 +47,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     const plan = subscription?.status === "active" ? (subscription?.plan || "starter") : "free";
-    const isActive = subscription?.status === "active";
 
     // Vérifie la limite mensuelle selon le plan
     if (plan === "free" || plan === "starter") {
